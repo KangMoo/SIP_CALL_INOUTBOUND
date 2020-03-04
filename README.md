@@ -1,2 +1,6 @@
 # SIP_CALL_INOUTBOUND
-SIP_CALL in/outbound test. Java
+
+This is for test of SIP call.
+
+~Inbound~
+Outbound
