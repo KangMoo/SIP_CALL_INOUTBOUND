@@ -130,6 +130,9 @@ public class SipCall implements SipListener{
         try {
             if (response.getStatusCode() == Response.OK) {
                 if (csq.equals(Request.INVITE)) {
+                    // Send ACK
+                    sipProcessResponse.sendACK(responseEvent);
+                    // Pass Response
                     sipProcessResponse.processResponseOk(responseEvent);
                 }
             }
