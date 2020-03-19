@@ -3,13 +3,14 @@ package com.signal.inout;
 import gov.nist.javax.sdp.SessionDescriptionImpl;
 import gov.nist.javax.sdp.parser.SDPAnnounceParser;
 
+import javax.sip.SipFactory;
 import javax.sip.SipProvider;
+import javax.sip.address.AddressFactory;
 import javax.sip.address.SipURI;
-import javax.sip.header.CallIdHeader;
-import javax.sip.header.FromHeader;
-import javax.sip.header.ToHeader;
-import javax.sip.header.ViaHeader;
+import javax.sip.header.*;
+import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
+import java.util.ArrayList;
 
 public class BoundModel {
     private String toip;
@@ -59,27 +60,50 @@ public class BoundModel {
     public String getToUser() {
         return toUser;
     }
+    public Request makeRequest(SipProvider sipProvider){
+        Request request = null;
+        try{
+            SipFactory sipFactory = SipFactory.getInstance();
+            MessageFactory messageFactory  = sipFactory.createMessageFactory();
+            HeaderFactory headerFactory = sipFactory.createHeaderFactory();
+            AddressFactory addressFactory = sipFactory.createAddressFactory();
 
+            //make Via
+            ArrayList viaHeaders = new ArrayList();
+            String address = sipProvider.getListeningPoint().getIPAddress();
+            ViaHeader viaHeader = headerFactory.createViaHeader(address, sipProvider.getListeningPoint("udp").getPort(),"udp",null);
+            viaHeaders.add(viaHeader);
+
+
+
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+
+
+
+        return request;
+    }
     public String getFromUser() {
         return fromUser;
     }
     public void setModel(Request request, SipProvider sipProvider){
         try{
-        this.toip = ((SipURI) ((ToHeader) request.getHeader("To")).getAddress().getURI()).getHost();
-        this.fromip = ((SipURI) ((FromHeader) request.getHeader("From")).getAddress().getURI()).getHost();
-        this.toPort =  Integer.parseInt(((SipURI)request.getRequestURI()).toString().split(":")[2]);
-        this.fromPort =  ((ViaHeader) request.getHeader("via")).getPort();
-        this.callId1 =  ((CallIdHeader) request.getHeader("Call-Id")).getCallId();
-        this.toUser = ((SipURI) ((ToHeader) request.getHeader("To")).getAddress().getURI()).getUser();
-        this.fromUser = ((SipURI) ((FromHeader) request.getHeader("From")).getAddress().getURI()).getUser();
+            this.toip = ((SipURI) ((ToHeader) request.getHeader("To")).getAddress().getURI()).getHost();
+            this.fromip = ((SipURI) ((FromHeader) request.getHeader("From")).getAddress().getURI()).getHost();
+            this.toPort =  Integer.parseInt(((SipURI)request.getRequestURI()).toString().split(":")[2]);
+            this.fromPort =  ((ViaHeader) request.getHeader("via")).getPort();
+            this.callId1 =  ((CallIdHeader) request.getHeader("Call-Id")).getCallId();
+            this.toUser = ((SipURI) ((ToHeader) request.getHeader("To")).getAddress().getURI()).getUser();
+            this.fromUser = ((SipURI) ((FromHeader) request.getHeader("From")).getAddress().getURI()).getUser();
 
-        this.callId2 = sipProvider.getNewCallId().getCallId();
+            this.callId2 = sipProvider.getNewCallId().getCallId();
 
-        String sdp = request.toString().substring(request.toString().length() - request.getContentLength().getContentLength(), request.toString().length());
-        SDPAnnounceParser parser = new SDPAnnounceParser(sdp);
-        SessionDescriptionImpl parsedDescription = parser.parse();
-        SessionDescriptionImpl sdpParser = new SessionDescriptionImpl(parsedDescription);
-        this.sdp = sdpParser.toString();
+            String sdp = request.toString().substring(request.toString().length() - request.getContentLength().getContentLength(), request.toString().length());
+            SDPAnnounceParser parser = new SDPAnnounceParser(sdp);
+            SessionDescriptionImpl parsedDescription = parser.parse();
+            SessionDescriptionImpl sdpParser = new SessionDescriptionImpl(parsedDescription);
+            this.sdp = sdpParser.toString();
 
         }catch (Exception e){
             e.printStackTrace();

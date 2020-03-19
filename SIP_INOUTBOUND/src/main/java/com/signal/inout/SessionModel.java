@@ -36,7 +36,7 @@ public class SessionModel implements Serializable {
         setSdp(sdp);
         setServerTransaction(st);
         setRequest(request);
-        setSeq(111L);
+        setSeq(seq);
     }
 
     public void setSession(String callId, String fromip, Integer fromPort, String fromUser, String toip, Integer toPort, String toUser, String type, String sdp, ServerTransaction st, Request request, Long seq){
@@ -51,7 +51,7 @@ public class SessionModel implements Serializable {
         setSdp(sdp);
         setServerTransaction(st);
         setRequest(request);
-        setSeq(111L);
+        setSeq(seq);
     }
 
     public SessionModel getSession(){

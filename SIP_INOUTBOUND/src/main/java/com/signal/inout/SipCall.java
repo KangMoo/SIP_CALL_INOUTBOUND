@@ -2,12 +2,14 @@ package com.signal.inout;
 
 import javax.sip.*;
 import javax.sip.address.AddressFactory;
+import javax.sip.header.CSeqHeader;
 import javax.sip.header.HeaderFactory;
 import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
 import java.util.Properties;
 import javax.sip.SipProvider;
 import javax.sip.SipStack;
+import javax.sip.message.Response;
 
 
 public class SipCall implements SipListener{
@@ -91,7 +93,6 @@ public class SipCall implements SipListener{
                 ex.printStackTrace();
             }
             System.out.println("== ~ ACK ==");
-
         }
         else if(request.getMethod().equals(Request.BYE)){
             System.out.println("== BYE ~ ==");
@@ -109,7 +110,6 @@ public class SipCall implements SipListener{
                     e.printStackTrace();
                 }
             }
-
             //SendResponse.getInstance().processResponseBye(request,sId,messageFactory);
             System.out.println("== ~ BYE ==");
         }
@@ -120,6 +120,30 @@ public class SipCall implements SipListener{
 
     @Override
     public void processResponse(ResponseEvent responseEvent) {
+
+
+        Response response = responseEvent.getResponse();
+        System.out.println("\\n\\n====================================================\n\nFirst Response is : " + response);
+        String csq = ((CSeqHeader) response.getHeader("Cseq")).getMethod();
+        ProcessResponse sipProcessResponse = new ProcessResponse();
+
+        try {
+            if (response.getStatusCode() == Response.OK) {
+                if (csq.equals(Request.INVITE)) {
+                    sipProcessResponse.processResponseOk(responseEvent);
+                }
+            }
+
+            else if (response.getStatusCode() == Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST) {
+                // Response Bye
+                sipProcessResponse.processResponseBye(responseEvent);
+            } else {
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override

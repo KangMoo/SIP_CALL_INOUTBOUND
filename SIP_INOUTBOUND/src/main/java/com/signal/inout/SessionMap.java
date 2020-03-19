@@ -30,7 +30,7 @@ public class SessionMap {
         session.setSdp(sdp);
         session.setServerTransaction(st);
         session.setRequest(request);
-        session.setSeq(111L);
+        session.setSeq(seq);
 
         return session;
     }
