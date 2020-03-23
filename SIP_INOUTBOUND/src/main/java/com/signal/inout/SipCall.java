@@ -34,12 +34,10 @@ public class SipCall implements SipListener{
         properties.setProperty("gov.nist.javax.sip.SERVER_LOG", "debug.log");
 
         OutSetting outSetting = OutSetting.getInstance();
-//        outSetting.setIp("127.0.0.1");
-//        outSetting.setPort(5060);
-        outSetting.setIp("192.168.7.33");
-        outSetting.setPort(5061);
-//        outSetting.setIp(ip);
-//        outSetting.setPort(port);
+        outSetting.setIp("127.0.0.1");
+        outSetting.setPort(5060);
+//        outSetting.setIp("192.168.7.33");
+//        outSetting.setPort(5061);
 
         try {
             sipStack = sipFactory.createSipStack(properties);
