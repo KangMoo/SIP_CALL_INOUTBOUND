@@ -43,8 +43,6 @@ public class SendResponse {
                 response.setContent(sdpbytes,contentTypeHeader);
             }
 
-
-
 //            String strAddress = "<" + ((SIPMessage)request).getTo().getAddress()+":"+((SIPMessage)request).getLocalPort() + ">";
 //            Address address = addressFactory.createAddress(strAddress);
             
@@ -100,16 +98,26 @@ public class SendResponse {
             e.printStackTrace();
         }
     }
+    public void sendOK(RequestEvent requestEvent){
+        try{
+            Request request = requestEvent.getRequest();
+            Dialog dialog = requestEvent.getDialog();
+            Long cseq = ((SIPMessage)request).getCSeq().getSeqNumber();
+
+            /////////////
+
+            /////////////
+
+            //dialog.createRequest();
+            //dialog.sendAck();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     public void send487(RequestEvent responseEvent) {
         try{
-            Request request = responseEvent.getRequest();
 
-            Dialog dialog = responseEvent.getDialog();
-            Long cseq = ((SIPMessage)request).getCSeq().getSeqNumber();
-
-            Request ackRequest = dialog.createAck(cseq);
-            dialog.sendAck(ackRequest);
         } catch (Exception e){
             e.printStackTrace();
         }

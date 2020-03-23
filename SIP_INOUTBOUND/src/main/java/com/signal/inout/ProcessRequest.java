@@ -10,6 +10,7 @@ import javax.sip.address.SipURI;
 import javax.sip.header.HeaderFactory;
 import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
+import javax.sip.message.Response;
 
 public class ProcessRequest {
 
@@ -31,15 +32,50 @@ public class ProcessRequest {
 
         // Pass INVITE to Server
         SendRequest.getInstance().passRequest(requestEvent, st);
-        System.out.println("st1 = " + st);
 
     }
     public void processCancel(RequestEvent requestEvent){
-        // Send 200 OK(Cancel)
+        Request request = requestEvent.getRequest();
+        ServerTransaction st = requestEvent.getServerTransaction();
+        try{
+            if(st == null){
+                System.out.println("ServerTransaction is null");
+                return;
+            }
+            // Reply 200 OK(Cancel)
+            Response response = SipCall.messageFactory.createResponse(200, request);
+            st.sendResponse(response);
 
-        // Send 487 Request Terminated
+            // Reply 487 Request Terminated
+            if(requestEvent.getDialog().getState() != DialogState.CONFIRMED){
+                response = SipCall.messageFactory.createResponse(Response.REQUEST_TERMINATED, request);
+                st.sendResponse(response);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
     }
+
+    public void processBye(RequestEvent requestEvent){
+        // Send ACK ~
+        Request request = requestEvent.getRequest();
+        ServerTransaction st = requestEvent.getServerTransaction();
+
+        try{
+            if(st == null){
+                System.out.println("ServerTransaction is null");
+                return;
+            }
+            //Dialog dialog = st.getDialog();
+            Response response = SipCall.messageFactory.createResponse(200, request);
+            st.sendResponse(response);
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+        // ~ Send ACK
+    }
+
     public ServerTransaction reply100_180(RequestEvent requestEvent, ServerTransaction transaction){
         Request request = requestEvent.getRequest();
 
@@ -93,5 +129,16 @@ public class ProcessRequest {
             e.printStackTrace();
         }
         return st;
+    }
+
+    public void processACK(RequestEvent requestEvent) {
+        Dialog dialog = requestEvent.getDialog();
+        try {
+            SipProvider provider = (SipProvider) requestEvent.getSource();
+            Request byeRequest = dialog.createRequest(Request.BYE);
+            ClientTransaction ct = provider.getNewClientTransaction(byeRequest);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }

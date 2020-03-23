@@ -34,10 +34,10 @@ public class SipCall implements SipListener{
         properties.setProperty("gov.nist.javax.sip.SERVER_LOG", "debug.log");
 
         OutSetting outSetting = OutSetting.getInstance();
-        outSetting.setIp("127.0.0.1");
-        outSetting.setPort(5060);
-//        outSetting.setIp("192.168.7.33");
-//        outSetting.setPort(5061);
+//        outSetting.setIp("127.0.0.1");
+//        outSetting.setPort(5060);
+        outSetting.setIp("192.168.7.33");
+        outSetting.setPort(5061);
 
         try {
             sipStack = sipFactory.createSipStack(properties);
@@ -80,34 +80,12 @@ public class SipCall implements SipListener{
 
         }else if(request.getMethod().equals(Request.ACK)){
             System.out.println("== ACK ~ ==");
-            Dialog dialog = requestEvent.getDialog();
-            try {
-                SipProvider provider = (SipProvider) requestEvent.getSource();
-                Request byeRequest = dialog.createRequest(Request.BYE);
-                ClientTransaction ct = provider.getNewClientTransaction(byeRequest);
-                //dialog.sendRequest(ct);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            processRequest.processACK(requestEvent);
             System.out.println("== ~ ACK ==");
         }
         else if(request.getMethod().equals(Request.BYE)){
             System.out.println("== BYE ~ ==");
-            ServerTransaction sId = requestEvent.getServerTransaction();
-            System.out.println("\n\n====================================================\n\nBye Request Inbound ServerTransaction" + sId);
-
-            if (sId == null) {
-                System.out.println("\n\n====================================================\n\nServerTransactionId is null");
-                try {
-                    SipProvider sipProvider;
-                    sipProvider = (SipProvider) requestEvent.getSource();
-                    sId = sipProvider.getNewServerTransaction(request);
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            //SendResponse.getInstance().processResponseBye(request,sId,messageFactory);
+            processRequest.processBye(requestEvent);
             System.out.println("== ~ BYE ==");
         }
         else if(request.getMethod().equals(Request.CANCEL)){
@@ -115,8 +93,9 @@ public class SipCall implements SipListener{
             System.out.println("== Cancel ==");
         }
         else if(request.getMethod().equals(Request.ACK)){
-            System.out.println("== ACK ==");
+            System.out.println("== ACK ~ ==");
             System.out.println("request = " + request);
+            System.out.println("== ~ ACK ==");
         }
     }
 
@@ -131,7 +110,6 @@ public class SipCall implements SipListener{
             if (response.getStatusCode() == Response.OK) {
                 if (csq.equals(Request.INVITE)) {
                     processResponse.processResponseOk(responseEvent);
-                    //processResponse.processInvite(responseEvent);
                 }
             }
             else if (response.getStatusCode() == Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST) {
