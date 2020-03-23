@@ -1,5 +1,7 @@
 package com.signal.inout;
 
+import com.signal.inout.outbound.OutSetting;
+
 import javax.sip.*;
 import javax.sip.address.AddressFactory;
 import javax.sip.header.CSeqHeader;
@@ -14,16 +16,15 @@ import javax.sip.message.Response;
 
 public class SipCall implements SipListener{
 
-    private SipProvider sipProvider;
-    private SipStack sipStack;
-    public SipFactory sipFactory;
-    public AddressFactory addressFactory;
-    public HeaderFactory headerFactory;
-    public MessageFactory messageFactory;
-    private int port;
+    public static SipProvider sipProvider;
+    public static SipStack sipStack;
+    public static SipFactory sipFactory;
+    public static AddressFactory addressFactory;
+    public static HeaderFactory headerFactory;
+    public static MessageFactory messageFactory;
+
 
     public SipCall(String ip, int port, String protocol){
-        this.port = port;
         System.out.println("\n\n====================================================\n\nSipSignal Setting and Start");
         sipFactory = SipFactory.getInstance();
         Properties properties = new Properties();
@@ -31,6 +32,14 @@ public class SipCall implements SipListener{
         properties.setProperty("javax.sip.STACK_NAME", "SIG_DEMO");
         properties.setProperty("gov.nist.javax.sip.DEBUG_LOG", "debug.log");
         properties.setProperty("gov.nist.javax.sip.SERVER_LOG", "debug.log");
+
+        OutSetting outSetting = OutSetting.getInstance();
+//        outSetting.setIp("127.0.0.1");
+//        outSetting.setPort(5060);
+        outSetting.setIp("192.168.7.33");
+        outSetting.setPort(5061);
+//        outSetting.setIp(ip);
+//        outSetting.setPort(port);
 
         try {
             sipStack = sipFactory.createSipStack(properties);
@@ -62,23 +71,13 @@ public class SipCall implements SipListener{
             e.printStackTrace();
         }
     }
-
-    public SipProvider getSipProvider(){
-        return this.sipProvider;
-    }
     @Override
     public void processRequest(RequestEvent requestEvent) {
-        System.out.println(requestEvent.toString());
         Request request = requestEvent.getRequest();
-        System.out.println(request.toString());
+        ProcessRequest processRequest = ProcessRequest.getInstance();
         if(request.getMethod().equals(Request.INVITE)) {
             System.out.println("== INVITE ~ ==");
-            ProcessRequest.getInstance().processRequestINVITE(requestEvent,
-                    messageFactory,
-                    addressFactory,
-                    headerFactory,
-                    sipProvider,
-                    port,this);
+            processRequest.processInvite(requestEvent);
             System.out.println("== ~ INVITE ==");
 
         }else if(request.getMethod().equals(Request.ACK)){
@@ -114,32 +113,32 @@ public class SipCall implements SipListener{
             System.out.println("== ~ BYE ==");
         }
         else if(request.getMethod().equals(Request.CANCEL)){
+            processRequest.processCancel(requestEvent);
             System.out.println("== Cancel ==");
+        }
+        else if(request.getMethod().equals(Request.ACK)){
+            System.out.println("== ACK ==");
+            System.out.println("request = " + request);
         }
     }
 
     @Override
     public void processResponse(ResponseEvent responseEvent) {
 
-
         Response response = responseEvent.getResponse();
         System.out.println("\\n\\n====================================================\n\nFirst Response is : " + response);
         String csq = ((CSeqHeader) response.getHeader("Cseq")).getMethod();
-        ProcessResponse sipProcessResponse = new ProcessResponse();
-
+        ProcessResponse processResponse = ProcessResponse.getInstance();
         try {
             if (response.getStatusCode() == Response.OK) {
                 if (csq.equals(Request.INVITE)) {
-                    // Send ACK
-                    sipProcessResponse.sendACK(responseEvent);
-                    // Pass Response
-                    sipProcessResponse.processResponseOk(responseEvent);
+                    processResponse.processResponseOk(responseEvent);
+                    //processResponse.processInvite(responseEvent);
                 }
             }
-
             else if (response.getStatusCode() == Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST) {
                 // Response Bye
-                sipProcessResponse.processResponseBye(responseEvent);
+                processResponse.processResponseBye(responseEvent);
             } else {
 
             }

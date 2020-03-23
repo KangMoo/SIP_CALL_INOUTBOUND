@@ -1,10 +1,9 @@
 package com.signal.inout;
 
 import gov.nist.javax.sip.message.SIPMessage;
+import gov.nist.javax.sip.message.SIPRequest;
 
-import javax.sip.ResponseEvent;
-import javax.sip.ServerTransaction;
-import javax.sip.SipFactory;
+import javax.sip.*;
 import javax.sip.address.Address;
 import javax.sip.address.AddressFactory;
 import javax.sip.address.SipURI;
@@ -13,49 +12,33 @@ import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 import java.text.ParseException;
+import java.util.ArrayList;
 
 public class ProcessResponse {
-
-    public void sendACK(ResponseEvent responseEvent){
-
+    private static ProcessResponse processResponse;
+    private ProcessResponse(){}
+    public static ProcessResponse getInstance(){
+        if(processResponse == null) processResponse = new ProcessResponse();
+        return processResponse;
     }
 
     public void processResponseOk(ResponseEvent responseEvent) throws ParseException {//, ServerTransaction transactionId) {
+        // Send ACK
+        SendRequest.getInstance().sendACK(responseEvent);
 
-        try{
-            HeaderFactory headerFactory = SipFactory.getInstance().createHeaderFactory();
-            MessageFactory messageFactory = SipFactory.getInstance().createMessageFactory();
-            AddressFactory addressFactory = SipFactory.getInstance().createAddressFactory();
-            Response response = responseEvent.getResponse();
-
-            String callId = ((CallIdHeader) response.getHeader( "Call-ID")).getCallId();
-            String sdp = response.toString().substring(response.toString().length() - response.getContentLength().getContentLength(), response.toString().length());;
-
-            Request request = SessionMap.getInstance().findRequest(callId);
-            response = messageFactory.createResponse(Response.OK, request);
-
-            byte[] sdpbytes = sdp.getBytes();
-            ContentTypeHeader contentTypeHeader = headerFactory.createContentTypeHeader("application","sdp");
-            response.setContent(sdpbytes,contentTypeHeader);
-
-
-            Address address = addressFactory.createAddress("<sip:127.0.0.1:5070>");
-            ContactHeader contactHeader = headerFactory.createContactHeader(address);
-            response.addHeader(contactHeader);
-
-
-            String in_callId = SessionMap.getInstance().findSession(callId).getCallId();
-            ServerTransaction st = SessionMap.getInstance().findTransactionId(in_callId);
-            System.out.println("st = " + st);
-
-
-            st.sendResponse(response);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        // Pass Response
+        SendResponse.getInstance().passResponseOK(responseEvent);
     }
 
     public void processResponseBye(ResponseEvent responseEvent) {
+
     }
 
+    public void processInvite(ResponseEvent responseEvent) {
+        // Send ACK
+        SendRequest.getInstance().sendACK(responseEvent);
+
+        // Pass Response
+        SendResponse.getInstance().passResponseOK(responseEvent);
+    }
 }

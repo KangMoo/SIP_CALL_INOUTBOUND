@@ -23,9 +23,9 @@ public class BoundModel {
     private String callId2;
     private String sdp;
 
-    public static BoundModel makeModel(Request request, SipProvider sipProvider){
+    public static BoundModel makeModel(Request request){
         BoundModel boundModel = new BoundModel();
-        boundModel.setModel(request,sipProvider);
+        boundModel.setModel(request);
         return boundModel;
     }
 
@@ -87,7 +87,8 @@ public class BoundModel {
     public String getFromUser() {
         return fromUser;
     }
-    public void setModel(Request request, SipProvider sipProvider){
+    public void setModel(Request request){
+
         try{
             this.toip = ((SipURI) ((ToHeader) request.getHeader("To")).getAddress().getURI()).getHost();
             this.fromip = ((SipURI) ((FromHeader) request.getHeader("From")).getAddress().getURI()).getHost();
@@ -96,8 +97,7 @@ public class BoundModel {
             this.callId1 =  ((CallIdHeader) request.getHeader("Call-Id")).getCallId();
             this.toUser = ((SipURI) ((ToHeader) request.getHeader("To")).getAddress().getURI()).getUser();
             this.fromUser = ((SipURI) ((FromHeader) request.getHeader("From")).getAddress().getURI()).getUser();
-
-            this.callId2 = sipProvider.getNewCallId().getCallId();
+            this.callId2 = SipCall.sipProvider.getNewCallId().getCallId();
 
             String sdp = request.toString().substring(request.toString().length() - request.getContentLength().getContentLength(), request.toString().length());
             SDPAnnounceParser parser = new SDPAnnounceParser(sdp);

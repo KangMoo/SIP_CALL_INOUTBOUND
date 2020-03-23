@@ -21,6 +21,9 @@ public class SessionModel implements Serializable {
     private String fromUser;
     private String sdp;
     private long seq;
+
+
+
     private String type;
 
     public void SessionModel(){}
@@ -124,6 +127,10 @@ public class SessionModel implements Serializable {
 
     public void setSeq(long seq) {
         this.seq = seq;
+    }
+
+    public long getSeq() {
+        return seq;
     }
 
     public Request getRequest() {

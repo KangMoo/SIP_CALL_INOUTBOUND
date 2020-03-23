@@ -17,7 +17,7 @@ public class SessionMap {
         return sessionMap;
     }
 
-    public SessionModel makeSession(String callId, String fromip, Integer fromPort, String fromUser, String toip, Integer toPort, String toUser, String type, String sdp, ServerTransaction st, Request request, Long seq){
+    public SessionModel makeSession(String callId, String fromip, Integer fromPort, String fromUser, String toip, Integer toPort, String toUser, String type, String sdp, ServerTransaction st,ClientTransaction ct, Request request, Long seq){
         SessionModel session = new SessionModel();
         session.setCallId(callId);
         session.setFromip(fromip);
@@ -29,6 +29,7 @@ public class SessionMap {
         session.setType(type);
         session.setSdp(sdp);
         session.setServerTransaction(st);
+        session.setClientTransaction(ct);
         session.setRequest(request);
         session.setSeq(seq);
 
@@ -60,9 +61,6 @@ public class SessionMap {
         Request request = session.getRequest();
 
 
-        System.out.println("revSessionModel~");
-        System.out.println(request);
-        System.out.println("~revSessionModel");
 
         ClientTransaction clientTransaction = null;
         try{
