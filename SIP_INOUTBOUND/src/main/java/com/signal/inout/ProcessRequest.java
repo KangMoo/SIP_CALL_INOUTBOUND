@@ -1,18 +1,12 @@
 package com.signal.inout;
 
-import ch.qos.logback.core.net.server.Client;
-import com.signal.inout.outbound.OutSetting;
 import gov.nist.javax.sip.message.SIPMessage;
 
 import javax.sip.*;
-import javax.sip.address.AddressFactory;
-import javax.sip.address.SipURI;
-import javax.sip.header.HeaderFactory;
-import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-public class ProcessRequest {
+public class ProcessRequest extends SipLogger  {
 
 
     //private static HashMap<String, SessionModel> SessionHmap = new HashMap<>();
@@ -39,7 +33,7 @@ public class ProcessRequest {
         ServerTransaction st = requestEvent.getServerTransaction();
         try{
             if(st == null){
-                System.out.println("ServerTransaction is null");
+                logger.debug("ServerTransaction is null");
                 return;
             }
             // Reply 200 OK(Cancel)
@@ -64,7 +58,7 @@ public class ProcessRequest {
 
         try{
             if(st == null){
-                System.out.println("ServerTransaction is null");
+                logger.debug("ServerTransaction is null");
                 return;
             }
             //Dialog dialog = st.getDialog();
@@ -98,7 +92,7 @@ public class ProcessRequest {
             if(st == null)
             {
                 st = ((SipProvider)requestEvent.getSource()).getNewServerTransaction(request);
-                System.out.println("Create Transaction ID : " + st);
+                logger.debug("Create Transaction ID : " + st);
             }
             // inbound Setting ~
             BoundModel boundModel = BoundModel.makeModel(request);
@@ -111,15 +105,19 @@ public class ProcessRequest {
                     boundModel.getFromip(),
                     boundModel.getFromPort(),
                     boundModel.getFromUser(),
+                    boundModel.getFromTag(),
                     boundModel.getToip(),
                     boundModel.getToPort(),
                     boundModel.getToUser(),
+                    boundModel.getToTag(),
                     "inbound",
                     boundModel.getSdp(),
                     st,null,
                     request,cseq);
+
             SessionMap.getInstance().putSession(boundModel.getCallId1(),in_session);
-            System.out.println("\n== Inbound Session ~ ==\n"+in_session.toString()+"\n== ~ Inbound Session ==\n");
+            logger.debug("boundModel = " + boundModel);
+            logger.debug("\n== Inbound Session ~ ==\n"+in_session.toString()+"\n== ~ Inbound Session ==\n");
             // ~ inbound Setting
 
 

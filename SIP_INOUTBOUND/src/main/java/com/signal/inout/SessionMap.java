@@ -8,7 +8,7 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 import java.util.HashMap;
 
-public class SessionMap {
+public class SessionMap  extends SipLogger {
     private HashMap<String, SessionModel> SessionHmap = new HashMap<>();
     private static SessionMap sessionMap =null;
     private SessionMap(){}
@@ -17,15 +17,17 @@ public class SessionMap {
         return sessionMap;
     }
 
-    public SessionModel makeSession(String callId, String fromip, Integer fromPort, String fromUser, String toip, Integer toPort, String toUser, String type, String sdp, ServerTransaction st,ClientTransaction ct, Request request, Long seq){
+    public SessionModel makeSession(String callId, String fromip, Integer fromPort, String fromUser,String fromTag, String toip, Integer toPort, String toUser,String toTag, String type, String sdp, ServerTransaction st,ClientTransaction ct, Request request, Long seq){
         SessionModel session = new SessionModel();
         session.setCallId(callId);
         session.setFromip(fromip);
         session.setFromPort(fromPort);
         session.setFromUser(fromUser);
+        session.setFromTag(fromTag);
         session.setToip(toip);
         session.setToPort(toPort);
         session.setToUser(toUser);
+        session.setToTag(toTag);
         session.setType(type);
         session.setSdp(sdp);
         session.setServerTransaction(st);
@@ -84,7 +86,7 @@ public class SessionMap {
     }
 
     public void putSession(String key, SessionModel session){
-        //System.out.println("putSession~\n" +session.toString()+"\n~putSession");
+        //logger.debug("putSession~\n" +session.toString()+"\n~putSession");
         SessionHmap.put(key,session);
     }
     public void deleteSessionModel(String key){
@@ -98,26 +100,26 @@ public class SessionMap {
     }
 
     public void processResponseTrying(Request request, ServerTransaction transactionId, MessageFactory messageFactory){
-        System.out.println("\n== processResponseTrying ~ ==");
+        logger.debug("\n== processResponseTrying ~ ==");
         try {
-            System.out.println("== Response Trying : \n" +request);
+            logger.debug("== Response Trying : \n" +request);
             Response response = messageFactory.createResponse( Response.TRYING, request);
-            System.out.println("== Response Data : \n" + response);
+            logger.debug("== Response Data : \n" + response);
             transactionId.sendResponse(response);
         }
         catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("== ~ processResponseTrying ==\n");
+        logger.debug("== ~ processResponseTrying ==\n");
     }
     public void processResponseRing (Request request, ServerTransaction transactionId, MessageFactory messageFactory) {
         try {
-            System.out.println("\n== processResponseRing ~ ==");
-            System.out.println("== Response Ringing : \n" + request);
+            logger.debug("\n== processResponseRing ~ ==");
+            logger.debug("== Response Ringing : \n" + request);
             Response response = messageFactory.createResponse( Response.RINGING, request);
-            System.out.println("== SipResponse Ringing : \n" + response);
+            logger.debug("== SipResponse Ringing : \n" + response);
             transactionId.sendResponse(response);
-            System.out.println("== ~ processResponseRing ==\n");
+            logger.debug("== ~ processResponseRing ==\n");
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -14,7 +14,7 @@ import javax.sip.SipStack;
 import javax.sip.message.Response;
 
 
-public class SipCall implements SipListener{
+public class SipCall extends SipLogger implements SipListener{
 
     public static SipProvider sipProvider;
     public static SipStack sipStack;
@@ -25,7 +25,7 @@ public class SipCall implements SipListener{
 
 
     public SipCall(String ip, int port, String protocol){
-        System.out.println("\n\n====================================================\n\nSipSignal Setting and Start");
+        logger.debug(" : SipSignal Setting and Start");
         sipFactory = SipFactory.getInstance();
         Properties properties = new Properties();
         properties.setProperty("javax.sip.IP_ADDRESS", "0.0.0.0");
@@ -55,12 +55,12 @@ public class SipCall implements SipListener{
             this.addressFactory = sipFactory.createAddressFactory();
             this.messageFactory = sipFactory.createMessageFactory();
             sipStack = sipFactory.createSipStack(properties);
-            System.out.println("\n\n====================================================\n\nSipStack Create " + sipStack);
+            logger.debug(" : SipStack Create " + sipStack);
             // SipProvider Create
             ListeningPoint listeningPoint = sipStack.createListeningPoint(ip,port,protocol);
-            System.out.println("\n\n====================================================\n\nSipListeningPoint Create " + listeningPoint);
+            logger.debug(" : SipListeningPoint Create " + listeningPoint);
             this.sipProvider = sipStack.createSipProvider(listeningPoint);
-            System.out.println("\n\n====================================================\n\nSipProvider Create " + sipProvider);
+            logger.debug(" : SipProvider Create " + sipProvider);
             // SipFactory Create
             this.sipProvider.addSipListener(this);
             sipStack.start();
@@ -74,28 +74,28 @@ public class SipCall implements SipListener{
         Request request = requestEvent.getRequest();
         ProcessRequest processRequest = ProcessRequest.getInstance();
         if(request.getMethod().equals(Request.INVITE)) {
-            System.out.println("== INVITE ~ ==");
+            logger.debug("== INVITE ~ ==");
             processRequest.processInvite(requestEvent);
-            System.out.println("== ~ INVITE ==");
+            logger.debug("== ~ INVITE ==");
 
         }else if(request.getMethod().equals(Request.ACK)){
-            System.out.println("== ACK ~ ==");
+            logger.debug("== ACK ~ ==");
             processRequest.processACK(requestEvent);
-            System.out.println("== ~ ACK ==");
+            logger.debug("== ~ ACK ==");
         }
         else if(request.getMethod().equals(Request.BYE)){
-            System.out.println("== BYE ~ ==");
+            logger.debug("== BYE ~ ==");
             processRequest.processBye(requestEvent);
-            System.out.println("== ~ BYE ==");
+            logger.debug("== ~ BYE ==");
         }
         else if(request.getMethod().equals(Request.CANCEL)){
             processRequest.processCancel(requestEvent);
-            System.out.println("== Cancel ==");
+            logger.debug("== Cancel ==");
         }
         else if(request.getMethod().equals(Request.ACK)){
-            System.out.println("== ACK ~ ==");
-            System.out.println("request = " + request);
-            System.out.println("== ~ ACK ==");
+            logger.debug("== ACK ~ ==");
+            logger.debug("request = " + request);
+            logger.debug("== ~ ACK ==");
         }
     }
 
@@ -103,7 +103,7 @@ public class SipCall implements SipListener{
     public void processResponse(ResponseEvent responseEvent) {
 
         Response response = responseEvent.getResponse();
-        System.out.println("\\n\\n====================================================\n\nFirst Response is : " + response);
+        logger.debug("\n\n====================================================\n\nFirst Response is : " + response);
         String csq = ((CSeqHeader) response.getHeader("Cseq")).getMethod();
         ProcessResponse processResponse = ProcessResponse.getInstance();
         try {

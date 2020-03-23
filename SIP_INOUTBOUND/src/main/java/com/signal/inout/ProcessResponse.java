@@ -14,7 +14,7 @@ import javax.sip.message.Response;
 import java.text.ParseException;
 import java.util.ArrayList;
 
-public class ProcessResponse {
+public class ProcessResponse  extends SipLogger {
     private static ProcessResponse processResponse;
     private ProcessResponse(){}
     public static ProcessResponse getInstance(){

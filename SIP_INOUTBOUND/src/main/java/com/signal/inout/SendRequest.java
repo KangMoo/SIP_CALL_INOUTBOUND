@@ -15,7 +15,7 @@ import javax.sip.address.AddressFactory;
 import javax.sip.message.MessageFactory;
 import java.util.ArrayList;
 
-public class SendRequest {
+public class SendRequest extends SipLogger  {
     private static SendRequest sendRequest = null;
 
     private SendRequest(){};
@@ -23,6 +23,7 @@ public class SendRequest {
         if(sendRequest == null) sendRequest = new SendRequest();
         return sendRequest;
     }
+
 
     public void processRequest(Request request, ClientTransaction clientTransaction, SipProvider sipProvider){
         Dialog dialog = clientTransaction.getDialog();
@@ -41,7 +42,6 @@ public class SendRequest {
         }
     }
 
-
     public Request makePassReq(SessionModel sessionModel,
                                String method,
                                String out_CallId){
@@ -53,24 +53,22 @@ public class SendRequest {
             MessageFactory messageFactory  = sipFactory.createMessageFactory();
             HeaderFactory headerFactory = sipFactory.createHeaderFactory();
             AddressFactory addressFactory = sipFactory.createAddressFactory();
-
+            SipProvider sipProvider = SipCall.sipProvider;
 
             ArrayList viaHeaders = new ArrayList();
-            SipProvider sipProvider = SipCall.sipProvider;
             String address = sipProvider.getListeningPoint().getIPAddress();
-            ViaHeader viaHeader = headerFactory.createViaHeader(address, sipProvider.getListeningPoint("udp").getPort(),"udp",null);
+            ViaHeader viaHeader = headerFactory.createViaHeader(address, sipProvider.getListeningPoint("udp").getPort(),"udp","z9hG4bKbranch1");
 
-            //ViaHeader viaHeader = headerFactory.createViaHeader(sessionModel.getToUser(), sessionModel.getToPort(),"udp",null);
             viaHeaders.add(viaHeader);
 
             String fromTags = (new Utils()).generateTag();
             String toTags = null;
             //String toTags = (new Utils()).generateTag();
-            SipURI toSipUrl = addressFactory.createSipURI(sessionModel.getToUser(),sessionModel.getToip());// OutSetting.getInstance().getIp());
+            SipURI toSipUrl = addressFactory.createSipURI(sessionModel.getToUser(),sessionModel.getToip());
             SipURI fromSipUrl=addressFactory.createSipURI(sessionModel.getFromUser(),sessionModel.getFromip());
             CallIdHeader callIdheader = headerFactory.createCallIdHeader(out_CallId);
             SipURI sipURI=((SipURI)addressFactory.createSipURI(sessionModel.getToUser(),OutSetting.getInstance().getIp()+":"+OutSetting.getInstance().getPort()));
-            CSeqHeader cseqHeader = headerFactory.createCSeqHeader(sessionModel.getSeq(),method);
+            CSeqHeader cseqHeader = headerFactory.createCSeqHeader(sessionModel.getSeq()-1,method);
             FromHeader fromHeader = headerFactory.createFromHeader(addressFactory.createAddress(fromSipUrl), fromTags);
             ToHeader toHeader = headerFactory.createToHeader(addressFactory.createAddress(toSipUrl), toTags);
             MaxForwardsHeader maxForwardsHeader = headerFactory.createMaxForwardsHeader(70);
@@ -85,8 +83,6 @@ public class SendRequest {
                     viaHeaders,
                     maxForwardsHeader
             );
-
-
             SipURI contactURI = addressFactory.createSipURI(sessionModel.getFromUser(), sessionModel.getFromip());
             contactURI.setPort(sessionModel.getFromPort());
             Address contactAddress = addressFactory.createAddress(contactURI);
@@ -102,11 +98,9 @@ public class SendRequest {
             }
             out_request.addHeader(contactHeader);
 
-
         }catch(Exception e){
             e.printStackTrace();
         }
-        System.out.println("out_request = " + out_request);
         return out_request;
     }
 
@@ -117,27 +111,30 @@ public class SendRequest {
         BoundModel boundModel = InboundModels.getInstance().get(address);
 
         SipProvider sipProvider = SipCall.sipProvider;
-        SessionModel in_session = SessionMap.getInstance().findSession(boundModel.getCallId1());
+
         
         Request temp = (Request)request.clone();
-        SIPMessage temp2 = (SIPMessage)temp;
 
-        Request out_request = makePassReq(in_session, Request.INVITE, boundModel.getCallId2());
-        System.out.println("out_request = " + out_request);
-
+        logger.debug("boundModel2 = " + boundModel);
         // outbound Setting ~
         SessionModel out_session = SessionMap.getInstance().makeSession(
                 boundModel.getCallId1(),
                 boundModel.getToip(),
                 boundModel.getToPort(),
-                boundModel.getFromUser(),
+                boundModel.getToUser(),
+                boundModel.getToTag(),
                 OutSetting.getInstance().getIp(),
                 OutSetting.getInstance().getPortByInt(),
-                boundModel.getToUser(),
-                "outbound",boundModel.getSdp(),st, null, out_request,((SIPMessage)request).getCSeq().getSeqNumber());
+                boundModel.getFromTag(),
+                "Server",
+                "outbound",boundModel.getSdp(),st, null, request,((SIPMessage)request).getCSeq().getSeqNumber());
         SessionMap.getInstance().putSession(boundModel.getCallId2(), out_session);
-        System.out.println("\n== Outbound Session ~ ==\n"+out_session.toString()+"\n== ~ Outbound Session ==\n");
+
         // ~ outbound Setting
+        Request out_request = makePassReq(out_session, Request.INVITE, boundModel.getCallId1());
+        out_session.setRequest(out_request);
+        logger.debug("\n== Outbound Session ~ ==\n"+out_session.toString()+"\n== ~ Outbound Session ==\n");
+        logger.debug("out_request = " + out_request);
 
         try{
             ClientTransaction clientTransaction;
@@ -150,6 +147,7 @@ public class SendRequest {
                 clientTransaction.createCancel();
             }
             Dialog dialog = clientTransaction.getDialog();
+
             dialog.sendRequest(clientTransaction);
         }catch (Exception e){
             e.printStackTrace();

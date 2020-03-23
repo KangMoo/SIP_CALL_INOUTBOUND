@@ -7,12 +7,13 @@ import javax.sip.message.Request;
 import java.io.Serializable;
 
 
-public class SessionModel implements Serializable {
+public class SessionModel  extends SipLogger  implements Serializable {
     private Request request;
     private String callId;
     private ServerTransaction serverTransaction;
     private ClientTransaction clientTransaction;
-
+    private String toTag;
+    private String fromTag;
     private String toip;
     private String fromip;
     private int toPort;
@@ -27,14 +28,16 @@ public class SessionModel implements Serializable {
     private String type;
 
     public void SessionModel(){}
-    public void SessionModel(String callId, String fromip, Integer fromPort, String fromUser, String toip, Integer toPort, String toUser, String type, String sdp, ServerTransaction st, Request request, Long seq){
+    public void SessionModel(String callId, String fromip, Integer fromPort, String fromUser,String fromTag, String toip, Integer toPort, String toUser,String toTag, String type, String sdp, ServerTransaction st, Request request, Long seq){
         setCallId(callId);
         setFromip(fromip);
         setFromPort(fromPort);
         setFromUser(fromUser);
+        setFromTag(fromTag);
         setToip(toip);
         setToPort(toPort);
         setToUser(toUser);
+        setToTag(toTag);
         setType(type);
         setSdp(sdp);
         setServerTransaction(st);
@@ -42,14 +45,16 @@ public class SessionModel implements Serializable {
         setSeq(seq);
     }
 
-    public void setSession(String callId, String fromip, Integer fromPort, String fromUser, String toip, Integer toPort, String toUser, String type, String sdp, ServerTransaction st, Request request, Long seq){
+    public void setSession(String callId, String fromip, Integer fromPort, String fromUser,String fromTag, String toip, Integer toPort, String toUser,String toTag, String type, String sdp, ServerTransaction st, Request request, Long seq){
         setCallId(callId);
         setFromip(fromip);
         setFromPort(fromPort);
         setFromUser(fromUser);
+        setFromTag(fromTag);
         setToip(toip);
         setToPort(toPort);
         setToUser(toUser);
+        setToTag(toTag);
         setType(type);
         setSdp(sdp);
         setServerTransaction(st);
@@ -166,14 +171,40 @@ public class SessionModel implements Serializable {
         this.clientTransaction = clientTransaction;
     }
 
+    public String getToTag() {
+        return toTag;
+    }
 
+    public String getFromTag() {
+        return fromTag;
+    }
 
+    public void setToTag(String toTag) {
+        this.toTag = toTag;
+    }
+
+    public void setFromTag(String fromTag) {
+        this.fromTag = fromTag;
+    }
 
     @Override
     public String toString() {
-        return String.format("SessionModel{callId='%s', request='%s', serverTransaction='%s', clientTransaction='%s', type='%s', toIp='%s', toPort='%s', toUser='%s'," +
-                        "fromIp='%s', fromPort='%s', fromUser='%s'  }"
-                , callId, request, serverTransaction, clientTransaction, type, toip, toPort, toUser, fromip, fromPort, fromUser);
+        return "SessionModel{" +
+                "request=" + request +
+                ", callId='" + callId + '\'' +
+                ", serverTransaction=" + serverTransaction +
+                ", clientTransaction=" + clientTransaction +
+                ", toTag='" + toTag + '\'' +
+                ", fromTag='" + fromTag + '\'' +
+                ", toip='" + toip + '\'' +
+                ", fromip='" + fromip + '\'' +
+                ", toPort=" + toPort +
+                ", fromPort=" + fromPort +
+                ", toUser='" + toUser + '\'' +
+                ", fromUser='" + fromUser + '\'' +
+                ", sdp='" + sdp + '\'' +
+                ", seq=" + seq +
+                ", type='" + type + '\'' +
+                '}';
     }
-
 }

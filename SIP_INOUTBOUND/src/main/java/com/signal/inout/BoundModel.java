@@ -2,6 +2,7 @@ package com.signal.inout;
 
 import gov.nist.javax.sdp.SessionDescriptionImpl;
 import gov.nist.javax.sdp.parser.SDPAnnounceParser;
+import gov.nist.javax.sip.message.SIPMessage;
 
 import javax.sip.SipFactory;
 import javax.sip.SipProvider;
@@ -12,9 +13,14 @@ import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
 import java.util.ArrayList;
 
-public class BoundModel {
+public class BoundModel  extends SipLogger {
     private String toip;
     private String fromip;
+
+
+
+    private String toTag;
+    private String fromTag;
     private int toPort;
     private int fromPort;
     private String toUser;
@@ -22,6 +28,23 @@ public class BoundModel {
     private String callId1;
     private String callId2;
     private String sdp;
+
+    @Override
+    public String toString() {
+        return "BoundModel{" +
+                "toip='" + toip + '\'' +
+                ", fromip='" + fromip + '\'' +
+                ", toTag='" + toTag + '\'' +
+                ", fromTag='" + fromTag + '\'' +
+                ", toPort=" + toPort +
+                ", fromPort=" + fromPort +
+                ", toUser='" + toUser + '\'' +
+                ", fromUser='" + fromUser + '\'' +
+                ", callId1='" + callId1 + '\'' +
+                ", callId2='" + callId2 + '\'' +
+                ", sdp='" + sdp + '\'' +
+                '}';
+    }
 
     public static BoundModel makeModel(Request request){
         BoundModel boundModel = new BoundModel();
@@ -98,7 +121,8 @@ public class BoundModel {
             this.toUser = ((SipURI) ((ToHeader) request.getHeader("To")).getAddress().getURI()).getUser();
             this.fromUser = ((SipURI) ((FromHeader) request.getHeader("From")).getAddress().getURI()).getUser();
             this.callId2 = SipCall.sipProvider.getNewCallId().getCallId();
-
+            this.toTag = ((SIPMessage) request).getToTag();
+            this.fromTag = ((SIPMessage) request).getFromTag();
             String sdp = request.toString().substring(request.toString().length() - request.getContentLength().getContentLength(), request.toString().length());
             SDPAnnounceParser parser = new SDPAnnounceParser(sdp);
             SessionDescriptionImpl parsedDescription = parser.parse();
@@ -145,5 +169,19 @@ public class BoundModel {
     public void setCallId2(String callId2) {
         this.callId2 = callId2;
     }
+    public void setToTag(String toTag) {
+        this.toTag = toTag;
+    }
 
+    public void setFromTag(String fromTag) {
+        this.fromTag = fromTag;
+    }
+
+    public String getToTag() {
+        return toTag;
+    }
+
+    public String getFromTag() {
+        return fromTag;
+    }
 }

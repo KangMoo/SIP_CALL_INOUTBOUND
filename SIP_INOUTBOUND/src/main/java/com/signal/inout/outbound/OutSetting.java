@@ -1,6 +1,8 @@
 package com.signal.inout.outbound;
 
-public class OutSetting {
+import com.signal.inout.SipLogger;
+
+public class OutSetting extends SipLogger {
     public static OutSetting outSetting;
     String ip;
     String port;
