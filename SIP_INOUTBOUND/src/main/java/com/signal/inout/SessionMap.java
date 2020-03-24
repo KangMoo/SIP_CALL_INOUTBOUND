@@ -102,24 +102,24 @@ public class SessionMap  extends SipLogger {
     public void processResponseTrying(Request request, ServerTransaction transactionId, MessageFactory messageFactory){
         logger.debug("\n== processResponseTrying ~ ==");
         try {
-            logger.debug("== Response Trying : \n" +request);
+            logger.debug("\n== Response Trying : \n" +request);
             Response response = messageFactory.createResponse( Response.TRYING, request);
-            logger.debug("== Response Data : \n" + response);
+            logger.debug("\n== Response Data : \n" + response);
             transactionId.sendResponse(response);
         }
         catch (Exception e) {
             e.printStackTrace();
         }
-        logger.debug("== ~ processResponseTrying ==\n");
+        logger.debug("\n== ~ processResponseTrying ==\n");
     }
     public void processResponseRing (Request request, ServerTransaction transactionId, MessageFactory messageFactory) {
         try {
             logger.debug("\n== processResponseRing ~ ==");
-            logger.debug("== Response Ringing : \n" + request);
+            logger.debug("\n== Response Ringing : \n" + request);
             Response response = messageFactory.createResponse( Response.RINGING, request);
-            logger.debug("== SipResponse Ringing : \n" + response);
+            logger.debug("\n== SipResponse Ringing : \n" + response);
             transactionId.sendResponse(response);
-            logger.debug("== ~ processResponseRing ==\n");
+            logger.debug("\n== ~ processResponseRing ==\n");
 
         } catch (Exception e) {
             e.printStackTrace();

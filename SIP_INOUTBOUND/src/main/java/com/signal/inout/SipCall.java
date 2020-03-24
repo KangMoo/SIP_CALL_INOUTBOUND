@@ -74,28 +74,28 @@ public class SipCall extends SipLogger implements SipListener{
         Request request = requestEvent.getRequest();
         ProcessRequest processRequest = ProcessRequest.getInstance();
         if(request.getMethod().equals(Request.INVITE)) {
-            logger.debug("== INVITE ~ ==");
+            logger.debug("\n== INVITE ~ ==");
             processRequest.processInvite(requestEvent);
-            logger.debug("== ~ INVITE ==");
+            logger.debug("\n== ~ INVITE ==");
 
         }else if(request.getMethod().equals(Request.ACK)){
-            logger.debug("== ACK ~ ==");
+            logger.debug("\n== ACK ~ ==");
             processRequest.processACK(requestEvent);
-            logger.debug("== ~ ACK ==");
+            logger.debug("\n== ~ ACK ==");
         }
         else if(request.getMethod().equals(Request.BYE)){
-            logger.debug("== BYE ~ ==");
+            logger.debug("\n== BYE ~ ==");
             processRequest.processBye(requestEvent);
-            logger.debug("== ~ BYE ==");
+            logger.debug("\n== ~ BYE ==");
         }
         else if(request.getMethod().equals(Request.CANCEL)){
             processRequest.processCancel(requestEvent);
-            logger.debug("== Cancel ==");
+            logger.debug("\n== Cancel ==");
         }
         else if(request.getMethod().equals(Request.ACK)){
-            logger.debug("== ACK ~ ==");
+            logger.debug("\n== ACK ~ ==");
             logger.debug("request = " + request);
-            logger.debug("== ~ ACK ==");
+            logger.debug("\n== ~ ACK ==");
         }
     }
 

@@ -77,24 +77,24 @@ public class SendResponse  extends SipLogger {
     public void sendResponseTrying(Request request, ServerTransaction transactionId){
         logger.debug("\n== processResponseTrying ~ ==");
         try {
-            logger.debug("== Response Trying : \n" +request);
+            logger.debug("\n== Response Trying : \n" +request);
             Response response = SipCall.messageFactory.createResponse( Response.TRYING, request);
-            logger.debug("== Response Data : \n" + response);
+            logger.debug("\n== Response Data : \n" + response);
             transactionId.sendResponse(response);
         }
         catch (Exception e) {
             e.printStackTrace();
         }
-        logger.debug("== ~ processResponseTrying ==\n");
+        logger.debug("\n== ~ processResponseTrying ==\n");
     }
     public void sendResponseRing (Request request, ServerTransaction transactionId) {
         try {
             logger.debug("\n== processResponseRing ~ ==");
-            logger.debug("== Response Ringing : \n" + request);
+            logger.debug("\n== Response Ringing : \n" + request);
             Response response = SipCall.messageFactory.createResponse( Response.RINGING, request);
-            logger.debug("== SipResponse Ringing : \n" + response);
+            logger.debug("\n== SipResponse Ringing : \n" + response);
             transactionId.sendResponse(response);
-            logger.debug("== ~ processResponseRing ==\n");
+            logger.debug("\n== ~ processResponseRing ==\n");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -109,30 +109,6 @@ public class SendResponse  extends SipLogger {
             Long cseq = ((SIPMessage)request).getCSeq().getSeqNumber();
             Request ackRequest = dialog.createAck(cseq);
             dialog.sendAck(ackRequest);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-    public void sendOK(RequestEvent requestEvent){
-        try{
-            Request request = requestEvent.getRequest();
-            Dialog dialog = requestEvent.getDialog();
-            Long cseq = ((SIPMessage)request).getCSeq().getSeqNumber();
-
-            /////////////
-
-            /////////////
-
-            //dialog.createRequest();
-            //dialog.sendAck();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    public void send487(RequestEvent responseEvent) {
-        try{
-
         } catch (Exception e){
             e.printStackTrace();
         }

@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 public class main {
     private static Logger logger = LoggerFactory.getLogger(main.class);
     public static void main(String[] args){
-        logger.debug("== Main Start ==");
+        logger.debug("\n== Main Start ==");
         SipCall sipCall = new SipCall("192.168.2.157",5070,"udp");
     }
 }
